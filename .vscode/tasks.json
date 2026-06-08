@@ -88,7 +88,7 @@
     {
       "label": "💾 Stage and Commit",
       "type": "shell",
-      "command": "git add . && git commit -m \"${input:commitMessage}\"",
+      "command": "git add . ; git commit -m \"${input:commitMessage}\"",
       "problemMatcher": [],
       "group": "build"
     },
