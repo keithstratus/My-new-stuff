@@ -1,0 +1,131 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🌿 Create Feature Branch",
+      "type": "shell",
+      "command": "git checkout Dev; git pull origin main; git checkout -b feature/${input:ticketId}; git push -u origin feature/${input:ticketId}",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🔄 Sync Branch with Main",
+      "type": "shell",
+      "command": "git fetch origin && git merge origin/main",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "📦 Retrieve Metadata from Org",
+      "type": "shell",
+      "command": "sf project retrieve start --manifest manifest/package.xml",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🚀 Deploy to Default Org",
+      "type": "shell",
+      "command": "sf project deploy start --manifest manifest/package.xml",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "✅ Dry Run Deploy (Check Only)",
+      "type": "shell",
+      "command": "sf project deploy start --manifest manifest/package.xml --dry-run --test-level RunLocalTests",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🧪 Run Apex Tests",
+      "type": "shell",
+      "command": "sf apex run test --test-level RunLocalTests --result-format human --wait 10",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🧪 Run Specific Apex Test Class",
+      "type": "shell",
+      "command": "sf apex run test --class-names ${input:testClassName} --result-format human --wait 10",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🔍 PMD Static Analysis",
+      "type": "shell",
+      "command": "pmd check --dir force-app --rulesets devops/pmd-ruleset.xml --format text",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "🔀 Create Promotion Branch",
+      "type": "shell",
+      "command": "git checkout org-${input:targetEnv} && git pull origin org-${input:targetEnv} && git checkout -b promotion/${input:ticketId}-${input:targetEnv} && git push -u origin promotion/${input:ticketId}-${input:targetEnv}",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🔥 Create Hotfix Branch",
+      "type": "shell",
+      "command": "git checkout main && git pull origin main && git checkout -b hotfix/${input:incidentId} && git push -u origin hotfix/${input:incidentId}",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "📋 Git Status",
+      "type": "shell",
+      "command": "git status",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "📜 Git Log (Last 10 Commits)",
+      "type": "shell",
+      "command": "git log --oneline -10",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "💾 Stage and Commit",
+      "type": "shell",
+      "command": "git add . && git commit -m \"${input:commitMessage}\"",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "🏥 Org Health Check",
+      "type": "shell",
+      "command": "sf org display && sf apex run test --test-level RunLocalTests --result-format human --wait 10",
+      "problemMatcher": [],
+      "group": "test"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "ticketId",
+      "type": "promptString",
+      "description": "Enter Jira ticket ID (e.g. US-00346)"
+    },
+    {
+      "id": "targetEnv",
+      "type": "pickString",
+      "description": "Select target environment",
+      "options": ["sit", "uat", "stage", "prod"]
+    },
+    {
+      "id": "incidentId",
+      "type": "promptString",
+      "description": "Enter incident or Jira ID (e.g. INC-1021-1.5)"
+    },
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Enter commit message (e.g. US-00346 Updated lead assignment rules)"
+    },
+    {
+      "id": "testClassName",
+      "type": "promptString",
+      "description": "Enter test class name (e.g. LeadAssignmentTest)"
+    }
+  ]
+}
